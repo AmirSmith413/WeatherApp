@@ -1,11 +1,10 @@
-let forecast = 'https://api.openweathermap.org/data/2.5/forecast?q='
-let apikey = "&appid=8dabd529605b4545977c162075b81c29";
+let forecast = "https://api.openweathermap.org/data/2.5/forecast?q=";
+// let apikey = "&appid=8dabd529605b4545977c162075b81c29";
 let city = "Stockton";
 let units = "&units=imperial";
 let degSymbol = "&deg;F";
 
-
-let day = document.getElementById('days')
+let day = document.getElementById("days");
 let icon = document.getElementById("icon");
 let place = document.getElementById("place");
 let temp = document.getElementById("temp");
@@ -38,35 +37,21 @@ let favArr = [];
 let weatherArr = [];
 let searchedCity = "";
 
-// function getWeek(){
-//    let currentDay = new Date()
-//    let nextDays = []
-//    for(let i = 0;i < 4;i++)
-//    {
-//     currentDay.setDate(currentDay.getDate() + 1)
-//     let day = currentDay.getDate()
-//     nextDays.push(day)
-//    } 
-//    days.innerText = day
-// }
-
 function fetchWeather(url) {
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
       getWeather(data);
     });
-    
 }
-searchBtn.addEventListener('click',function(e){
+searchBtn.addEventListener("click", function (e) {
   fetchWeather(`${forecast}${search.value}${apikey}${units}`);
-})
+});
 
 function getWeather(weatherData) {
-  console.log(weatherData)
+  console.log(weatherData);
   weatherArr = [];
   weatherArr.push(weatherData);
-  // let main = weatherData.main;
   place.innerText = weatherData.city.name;
   temp.innerHTML = `${parseInt(weatherData.list[0].main.temp)}${degSymbol}`;
   temp2.innerHTML = `${parseInt(weatherData.list[1].main.temp)}${degSymbol}`;
@@ -74,12 +59,80 @@ function getWeather(weatherData) {
   temp4.innerHTML = `${parseInt(weatherData.list[3].main.temp)}${degSymbol}`;
   temp5.innerHTML = `${parseInt(weatherData.list[4].main.temp)}${degSymbol}`;
   temp6.innerHTML = `${parseInt(weatherData.list[5].main.temp)}${degSymbol}`;
-  feels_like.innerText = parseInt(weatherData.list[0].main.feels_like)
+  feels_like.innerText = parseInt(weatherData.list[0].main.feels_like);
   temp_min.innerText = parseInt(weatherData.list[0].main.temp_min);
   temp_max.innerText = parseInt(weatherData.list[0].main.temp_max);
+  temp_min2.innerText = parseInt(weatherData.list[1].main.temp_min);
+  temp_max2.innerText = parseInt(weatherData.list[1].main.temp_max);
+  temp_min3.innerText = parseInt(weatherData.list[2].main.temp_min);
+  temp_max3.innerText = parseInt(weatherData.list[2].main.temp_max);
+  temp_min4.innerText = parseInt(weatherData.list[3].main.temp_min);
+  temp_max4.innerText = parseInt(weatherData.list[3].main.temp_max);
+  temp_min5.innerText = parseInt(weatherData.list[4].main.temp_min);
+  temp_max5.innerText = parseInt(weatherData.list[4].main.temp_max);
+  temp_min6.innerText = parseInt(weatherData.list[5].main.temp_min);
+  temp_max6.innerText = parseInt(weatherData.list[5].main.temp_max);
   speed.innerText = parseInt(weatherData.list[0].wind.speed);
   deg.innerText = parseInt(weatherData.list[0].wind.deg);
   search.value;
 }
 
+favBtn.addEventListener("click", (e) => {
+  let obj = {
+    name: (weatherArr = [weatherArr.length - 1].name),
+    url: `${forecast}${searchedCity}${apikey}${units}`,
+  };
+  favArr.push(obj);
+  let colDiv = document.createElement("div");
+  colDiv.classList = "col";
+  let pTag = document.createElement("p");
+  pTag.innerText = search.value;
+  pTag.addEventListener("click", (e) => {
+    fetchWeather(obj.url);
+  });
+  colDiv.appendChild(pTag);
+  injectFav.appendChild(colDiv);
 
+  localStorage.setItem("favWeather", JSON.stringify());
+});
+
+delBtn.addEventListener("click", (e) => {
+  for(let i = 0;i < favArr.length;i++)
+  {
+    if(place.innerText.toLowerCase() === favArr[i].name.toLowerCase()){
+      favArr.splice(i,1)
+      let colDiv = injectFav.getElementsByClassName('col')[i]
+      injectFav.removeChild(colDiv)
+    }
+    
+  }
+  localStorage.setItem('favWeather',JSON.stringify(favArr))
+});
+
+let favData = JSON.parse(localStorage.getItem("favWeather"));
+if (favData && favData !== null) {
+  for (let i = 0; i < favData.length; i++) {
+    if (i === 0) {
+      fetchWeather(favData[i].url);
+      let colDiv = document.createElement("div");
+      colDiv.classList = "col";
+      let pTag = document.createElement("p");
+      pTag.innerText = favData[i].name;
+      pTag.addEventListener("click", (e) => {
+        fetchWeather(favData[i].url);
+      });
+      colDiv.appendChild(pTag);
+      injectFav.appendChild(colDiv);
+    } else {
+      let colDiv = document.createElement("div");
+      colDiv.classList = "col";
+      let pTag = document.createElement("p");
+      pTag.innerText = favData[i].name;
+      pTag.addEventListener("click", (e) => {
+        fetchWeather(favData[i].url);
+      });
+      colDiv.appendChild(pTag);
+      injectFav.appendChild(colDiv);
+    }
+  }
+}

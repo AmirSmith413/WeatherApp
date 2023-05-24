@@ -1,6 +1,6 @@
 let forecast = "https://api.openweathermap.org/data/2.5/forecast?q=";
-// let apikey = "&appid=8dabd529605b4545977c162075b81c29";
-let city = "Stockton";
+// let apikey = "&appid=8dabd529605b4545977c162075b81c29"; //weather key api goes here
+let city = "";
 let units = "&units=imperial";
 let degSymbol = "&deg;F";
 
@@ -36,6 +36,7 @@ let injectFav = document.getElementById("inject");
 let favArr = [];
 let weatherArr = [];
 let searchedCity = "";
+let vol = true
 
 function fetchWeather(url) {
   fetch(url)
@@ -77,40 +78,10 @@ function getWeather(weatherData) {
   search.value;
 }
 
-favBtn.addEventListener("click", (e) => {
-  let obj = {
-    name: (weatherArr = [weatherArr.length - 1].name),
-    url: `${forecast}${searchedCity}${apikey}${units}`,
-  };
-  favArr.push(obj);
-  let colDiv = document.createElement("div");
-  colDiv.classList = "col";
-  let pTag = document.createElement("p");
-  pTag.innerText = search.value;
-  pTag.addEventListener("click", (e) => {
-    fetchWeather(obj.url);
-  });
-  colDiv.appendChild(pTag);
-  injectFav.appendChild(colDiv);
-
-  localStorage.setItem("favWeather", JSON.stringify());
-});
-
-delBtn.addEventListener("click", (e) => {
-  for(let i = 0;i < favArr.length;i++)
-  {
-    if(place.innerText.toLowerCase() === favArr[i].name.toLowerCase()){
-      favArr.splice(i,1)
-      let colDiv = injectFav.getElementsByClassName('col')[i]
-      injectFav.removeChild(colDiv)
-    }
-    
-  }
-  localStorage.setItem('favWeather',JSON.stringify(favArr))
-});
-
+//creating a place for the stored cities
 let favData = JSON.parse(localStorage.getItem("favWeather"));
-if (favData && favData !== null) {
+if (favData && favData != null) {
+  favArr = favData;
   for (let i = 0; i < favData.length; i++) {
     if (i === 0) {
       fetchWeather(favData[i].url);
@@ -121,6 +92,7 @@ if (favData && favData !== null) {
       pTag.addEventListener("click", (e) => {
         fetchWeather(favData[i].url);
       });
+
       colDiv.appendChild(pTag);
       injectFav.appendChild(colDiv);
     } else {
@@ -131,8 +103,58 @@ if (favData && favData !== null) {
       pTag.addEventListener("click", (e) => {
         fetchWeather(favData[i].url);
       });
+
       colDiv.appendChild(pTag);
       injectFav.appendChild(colDiv);
     }
   }
 }
+
+//for adding cities
+favBtn.addEventListener("click", (e) => {
+  let obj = {
+    name: weatherArr[weatherArr.length - 1].city.name,
+    url: `${forecast}${search.value}${apikey}${units}`,
+  };
+  console.log(obj);
+  favArr.push(obj);
+  let colDiv = document.createElement("div");
+  colDiv.classList = "col";
+  let pTag = document.createElement("p");
+  pTag.innerText = search.value;
+  pTag.addEventListener("click", (e) => {
+    fetchWeather(obj.url);
+  });
+
+  colDiv.appendChild(pTag);
+  injectFav.appendChild(colDiv);
+
+  localStorage.setItem("favWeather", JSON.stringify(favArr));
+});
+
+//delete button
+delBtn.addEventListener("click", (e) => {
+  for (let i = 0; i < favArr.length; i++) {
+    if (place.innerText.toLowerCase() === favArr[i].name.toLowerCase()) {
+      favArr.splice(i, 1);
+      let colDiv = injectFav.getElementsByClassName("col")[i];
+      injectFav.removeChild(colDiv);
+    }
+  }
+  localStorage.setItem("favWeather", JSON.stringify(favArr));
+});
+
+
+//for music
+let audio = document.getElementById("sound");
+audio.play();
+let volumeBtn = document.getElementById("volume-btn");
+volumeBtn.addEventListener("click", function (e) {
+  if (vol) {
+    audio.pause();
+    vol = false;
+  } else {
+    audio.play();
+    vol = true;
+  }
+});
